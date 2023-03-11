@@ -243,7 +243,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: const[
-                              Text('Temperature'),
+                              Text('Air Temperature'),
                               Text(
                                 '50',
                                 style: TextStyle(
@@ -271,7 +271,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: const[
-                              Text('Humidity'),
+                              Text('Air Humidity'),
                               Text(
                                 // '${humidityAnimation.value.toInt}',
                                 '20',
@@ -302,7 +302,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const[
-                          Text('Humidity'),
+                          Text('Soil Humidity'),
                           Text(
                             // '${humidityAnimation.value.toInt}',
                             '20',

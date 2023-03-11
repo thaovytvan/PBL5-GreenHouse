@@ -52,7 +52,7 @@ class _CustomCardState extends State<CustomCard>
       height: 140,
       width: widget.size.width * 0.9,
       decoration: BoxDecoration(
-        color: kBgColor,
+        color: Constants.primaryColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
@@ -83,7 +83,8 @@ class _CustomCardState extends State<CustomCard>
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          if (_animationController.isCompleted) {
+                          _animationController.animateTo(0);
+                          if (_animationController.isCompleted ) {
                             _animationController.animateTo(20);
                           } else {
                             _animationController.animateTo(0);
@@ -97,18 +98,7 @@ class _CustomCardState extends State<CustomCard>
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.grey.shade50,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade200,
-                              blurRadius: 8,
-                              offset: const Offset(3, 3),
-                            ),
-                           const BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 5,
-                              offset: Offset(-3, -3),
-                            ),
-                          ],
+
                         ),
                         child: Align(
                           alignment: _animation.value,
@@ -119,7 +109,7 @@ class _CustomCardState extends State<CustomCard>
                                 vertical: 2, horizontal: 1),
                             decoration: BoxDecoration(
                               color: isChecked
-                                  ? Colors.grey.shade300
+                                  ? Colors.black54
                                   : kGreenColor,
                               shape: BoxShape.circle,
                             ),
@@ -138,14 +128,14 @@ class _CustomCardState extends State<CustomCard>
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: kBlueColor,
+                color: Colors.white,
               ),
             ),
             Text(
               isChecked ? widget.statusOff : widget.statusOn,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isChecked ? Colors.grey.withOpacity(0.6) : kGreenColor,
+                color: isChecked ? Colors.white : kGreenColor,
               ),
             ),
           ],

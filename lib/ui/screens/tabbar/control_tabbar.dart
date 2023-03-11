@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:green_garden/components/custom_card.dart';
+import 'package:green_garden/constants.dart';
 
 class ControlTabBar extends StatefulWidget {
   const ControlTabBar({Key? key}) : super(key: key);
@@ -27,14 +28,15 @@ class _ControlTabBarState extends State<ControlTabBar> {
             ),
           ),
       ),
+      const SizedBox(height: 15),
 
       const SizedBox(height: 15),
           CustomCard(
             size: size,
-            icon: ImageIcon(
-              const AssetImage('assets/lights.png'),
+            icon: const ImageIcon(
+              AssetImage('assets/lights.png'),
               size: 55,
-              color: Colors.grey.shade400,
+              color: Colors.white,
             ),
             title: "LIGHTS",
             statusOn: "ON",
@@ -43,10 +45,10 @@ class _ControlTabBarState extends State<ControlTabBar> {
       const SizedBox(height: 15),
       CustomCard(
         size: size,
-        icon: ImageIcon(
-          const AssetImage('assets/fan.png'),
+        icon: const ImageIcon(
+          AssetImage('assets/fan.png'),
           size: 55,
-          color: Colors.grey.shade400,
+          color: Colors.white,
         ),
         title: "FAN",
         statusOn: "ON",
@@ -55,10 +57,10 @@ class _ControlTabBarState extends State<ControlTabBar> {
       const SizedBox(height: 15),
       CustomCard(
         size: size,
-        icon: ImageIcon(
-          const AssetImage('assets/water_pump.png'),
+        icon: const ImageIcon(
+          AssetImage('assets/water_pump.png'),
           size: 55,
-          color: Colors.grey.shade400,
+          color: Colors.white,
         ),
         title: "WATER PUMP",
         statusOn: "ON",

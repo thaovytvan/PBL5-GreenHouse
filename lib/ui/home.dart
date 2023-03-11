@@ -38,7 +38,21 @@ class _HomePageState extends State<HomePage>{
                    fontWeight: FontWeight.w500,
                    fontSize: 24,
                  ),),
-                 Icon(Icons.notifications, color: Constants.blackColor, size: 30.0,),
+                 Container(
+                   decoration: BoxDecoration(
+                     boxShadow: [
+                       BoxShadow(
+                         color: Colors.grey.withOpacity(0.5),
+
+                         offset: Offset(0, 3), // changes position of shadow
+                       ),
+                     ],
+                     borderRadius: BorderRadius.circular(30),
+                   ),
+                   child: Icon(Icons.notifications, color: Constants.blackColor, size: 30.0,),
+
+                 ),
+
                ],
              ),
 

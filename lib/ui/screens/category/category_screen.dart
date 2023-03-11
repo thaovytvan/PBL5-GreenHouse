@@ -22,7 +22,7 @@ class _CategoryScreenState extends State <CategoryScreen>{
     Container(child: const OverviewTabBar()),
     Container(child: const ControlTabBar()),
     Container(child: const Text('Plant History')),
-      Container(child: const Text('Pest and Disease History')),
+    Container(child: const Text('Pest and Disease History')),
     Container(child: const Text('Camera')),
   ];
 

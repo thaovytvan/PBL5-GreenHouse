@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.untitled">
+    package="com.example.GreenHouse_app">
    <application
-        android:label="untitled"
+        android:label="GreenHouse_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
