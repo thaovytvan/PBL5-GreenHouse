@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:green_garden/constants.dart';
+import 'package:web_socket_channel/io.dart';
 
 class CustomCard extends StatefulWidget {
   const CustomCard(
@@ -25,10 +26,22 @@ class _CustomCardState extends State<CustomCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<Alignment> _animation;
-  bool isChecked = true;
+
+  // esp8266
+  bool isChecked = false ;
+   //boolean value to track device status, if its ON or OFF
+  late IOWebSocketChannel channel;
+  bool connected = false; //boolean value to track if WebSocket is connected
 
   @override
   void initState() {
+    // connect esp8266
+
+    Future.delayed(Duration.zero, () async {
+      channelconnect(); //connect to WebSocket wth NodeMCU
+    });
+
+    // code mobile
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 350),
@@ -46,13 +59,62 @@ class _CustomCardState extends State<CustomCard>
     super.initState();
   }
 
+  // esp8266 connect function
+  channelconnect() {
+    //function to connect
+    try {
+      channel =
+          IOWebSocketChannel.connect("ws://192.168.0.1:81"); //channel IP : Port
+      channel.stream.listen(
+            (message) {
+          print(message);
+          setState(() {
+            if (message == "connected") {
+              connected = true; //message is "connected" from NodeMCU
+            } else if (message == "${widget.title}on:success") {
+              isChecked = true;
+            } else if (message == "${widget.title}off:success") {
+              isChecked = false;
+            }
+          });
+        },
+        onDone: () {
+          //if WebSocket is disconnected
+          print("Web socket is closed");
+          setState(() {
+            connected = false;
+          });
+        },
+        onError: (error) {
+          print(error.toString());
+        },
+      );
+    } catch (_) {
+      print("error on connecting to websocket.");
+    }
+  }
+
+  Future<void> sendcmd(String cmd) async {
+    if (connected == true) {
+      if (isChecked == false && cmd != "${widget.title}on" && cmd != "${widget.title}off") {
+        print("Send the valid command");
+      } else {
+        channel.sink.add(cmd); //sending Command to NodeMCU
+      }
+    } else {
+      channelconnect();
+      print("Websocket is not connected.");
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 140,
+      height: widget.size.height * 0.16,
       width: widget.size.width * 0.9,
       decoration: BoxDecoration(
-        color: Constants.primaryColor,
+        color: Constants.primaryColor.withOpacity(.75),
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
@@ -89,7 +151,18 @@ class _CustomCardState extends State<CustomCard>
                           } else {
                             _animationController.animateTo(0);
                           }
-                          isChecked = !isChecked;
+                          if (isChecked) {
+                            //if ledstatus is true, then turn off the led
+                            //if led is on, turn off
+                            sendcmd("${widget.title}off");
+                            isChecked = false;
+                          } else {
+                            //if ledstatus is false, then turn on the led
+                            //if led is off, turn on
+                            sendcmd("${widget.title}ron");
+                            isChecked = true;
+                          }
+
                         });
                       },
                       child: Container(
@@ -108,7 +181,7 @@ class _CustomCardState extends State<CustomCard>
                             margin: const EdgeInsets.symmetric(
                                 vertical: 2, horizontal: 1),
                             decoration: BoxDecoration(
-                              color: isChecked
+                              color: !isChecked
                                   ? Colors.black54
                                   : kGreenColor,
                               shape: BoxShape.circle,
@@ -132,10 +205,10 @@ class _CustomCardState extends State<CustomCard>
               ),
             ),
             Text(
-              isChecked ? widget.statusOff : widget.statusOn,
+              !isChecked ? widget.statusOff : widget.statusOn,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isChecked ? Colors.white : kGreenColor,
+                color: !isChecked ? Colors.white : kGreenColor,
               ),
             ),
           ],

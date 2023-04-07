@@ -1,14 +1,20 @@
 import 'dart:convert';
 
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
+
+
 import 'package:flutter/material.dart';
+import 'package:green_garden/components/temphumi.dart';
 import 'package:green_garden/components/circleprogress.dart';
 import 'package:green_garden/constants.dart';
 import 'package:green_garden/components/weather_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+const String esp_url = 'ws://192.168.99.100:81';
+
 class OverviewTabBar extends StatefulWidget {
   const OverviewTabBar({Key? key}) : super(key: key);
-
   @override
   State<OverviewTabBar> createState() => _OverviewTabBarState();
 }
@@ -20,6 +26,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   int windSpeed = 0;
   int humidity = 0;
   int cloud = 0;
+
   String currentDate = '';
 
   List hourlyWeatherForecast = [];
@@ -27,12 +34,17 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
 
   String currentWeatherStatus = '';
 
+
+  //dht11
+  bool isLoaded = false;
+  String msg = '';
+  TempHumi dht = TempHumi(0, 0);
+  final channel = IOWebSocketChannel.connect(esp_url);
+
   //API Call
   String searchWeatherAPI = "https://api.weatherapi.com/v1/forecast.json?key=" +
       API_KEY +
       "&days=7&q=";
-
-
   void fetchWeatherData(String searchText) async {
     try {
       var searchResult =
@@ -86,16 +98,60 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
       return " ";
     }
   }
+
+  //dht11, do am dat
+  double soilMoistureValue = 0;
+
   @override
   void initState() {
-    fetchWeatherData(location);
     super.initState();
+    fetchWeatherData(location);
+    channel.stream.listen(
+          (message) {
+        channel.sink.add('Flutter received $message');
+        if (message == "connected") {
+          print('Received from MCU: $message');
+          setState(() {
+            msg = message;
+          });
+        } else {
+          print('Received from MCU: $message');
+          // {'tempC':'30.50','humi':'64.00'}
+          Map<String, dynamic> json = jsonDecode(message);
+          setState(() {
+            soilMoistureValue = double.parse(message);
+            dht = TempHumi.fromJson(json);
+            isLoaded = true;
+          });
+        }
+        //channel.sink.close(status.goingAway);
+      },
+      onDone: () {
+        //if WebSocket is disconnected
+        print("Web socket is closed");
+        setState(() {
+          msg = 'disconnected';
+          isLoaded = false;
+        });
+      },
+      onError: (error) {
+        print(error.toString());
+      },
+    );
+    // Fluttertoast.showToast(${msg});
   }
+
+
+  // @override
+  // void initState() {
+  //   fetchWeatherData(location);
+  //   super.initState();
+  // }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return  Scaffold(
-      body:
+    return  SingleChildScrollView(
+      child:
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -155,7 +211,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  ]
+                                  ],
                               ),
 
                               Row(
@@ -240,12 +296,14 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                         width: 200,
                         height: 200,
                         child: Center(
-                          child: Column(
+                          child: !isLoaded
+                              ? const CircularProgressIndicator()
+                              : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const[
+                            children: [
                               Text('Air Temperature'),
                               Text(
-                                '50',
+                               '${dht.tempC.toStringAsFixed(1)}',
                                 style: TextStyle(
                                     fontSize: 50, fontWeight: FontWeight.bold),
                               ),
@@ -268,13 +326,14 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                         width: 200,
                         height: 200,
                         child: Center(
-                          child: Column(
+                          child: !isLoaded
+                              ? const CircularProgressIndicator()
+                              : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const[
+                            children: [
                               Text('Air Humidity'),
                               Text(
-                                // '${humidityAnimation.value.toInt}',
-                                '20',
+                                '${dht.humi.toStringAsFixed(1)}',
                                 style: TextStyle(
                                     fontSize: 50, fontWeight: FontWeight.bold),
                               ),
@@ -299,13 +358,14 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                     width: 200,
                     height: 200,
                     child: Center(
-                      child: Column(
+                      child: !isLoaded
+                          ? const CircularProgressIndicator()
+                          :Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const[
+                        children: [
                           Text('Soil Humidity'),
                           Text(
-                            // '${humidityAnimation.value.toInt}',
-                            '20',
+                             '${soilMoistureValue.toStringAsFixed(1)}',
                             style: TextStyle(
                                 fontSize: 50, fontWeight: FontWeight.bold),
                           ),
