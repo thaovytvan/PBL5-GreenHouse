@@ -9,7 +9,10 @@ class CategoryScreen extends StatefulWidget {
   State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _CategoryScreenState extends State <CategoryScreen>{
+class _CategoryScreenState extends State<CategoryScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
   final List<Tab> myTabs = <Tab>[
     const Tab(text: 'Overview'),
     const Tab(text: 'Control'),
@@ -19,38 +22,66 @@ class _CategoryScreenState extends State <CategoryScreen>{
   ];
 
   final List<Widget> myTabViews = <Widget>[
-    Container(child: const OverviewTabBar()),
-    Container(child: const ControlTabBar()),
-    Container(child: const Text('Plant History')),
-    Container(child: const Text('Pest and Disease History')),
-    Container(child: const Text('Camera')),
+    OverviewTabBar(),
+    ControlTabBar(),
+    const Text('Plant History'),
+    const Text('Pest and Disease History'),
+    const Text('Camera'),
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: myTabs.length,
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 2,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          bottom:
-          TabBar(
-            labelColor: Constants.primaryColor,
-            unselectedLabelColor: Colors.grey,
-            tabs: myTabs,
-            isScrollable: true,
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: myTabs.length, vsync: this);
+  }
 
-          ),
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 2,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        bottom: TabBar(
+          labelColor: Constants.primaryColor,
+          unselectedLabelColor: Colors.grey,
+          tabs: myTabs,
+          controller: _tabController,
+          isScrollable: true,
         ),
-        body: TabBarView(
-          children:
-          myTabViews,
-        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: myTabViews.map((widget) {
+          return KeepAliveWrapper(widget);
+        }).toList(),
       ),
     );
   }
 }
 
-  
+class KeepAliveWrapper extends StatefulWidget {
+  final Widget child;
+  const KeepAliveWrapper(this.child);
+
+  @override
+  _KeepAliveWrapperState createState() => _KeepAliveWrapperState();
+}
+
+class _KeepAliveWrapperState extends State<KeepAliveWrapper>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}

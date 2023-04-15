@@ -1,6 +1,7 @@
 import 'dart:convert';
-
+import 'dart:async';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 
 
@@ -11,7 +12,8 @@ import 'package:green_garden/constants.dart';
 import 'package:green_garden/components/weather_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-const String esp_url = 'ws://192.168.99.100:81';
+// const String esp_url = 'ws://192.168.222.197:8080';
+// final channel = IOWebSocketChannel.connect('ws://192.168.222.197:8080');
 
 class OverviewTabBar extends StatefulWidget {
   const OverviewTabBar({Key? key}) : super(key: key);
@@ -19,6 +21,12 @@ class OverviewTabBar extends StatefulWidget {
   State<OverviewTabBar> createState() => _OverviewTabBarState();
 }
 class _OverviewTabBarState extends State<OverviewTabBar>{
+  //websocket
+  late IOWebSocketChannel channel;
+  String _temperature = "0";
+  String _humidity = "0";
+  String _anaValue = "0";
+  //
   static String API_KEY = "681e5b5e20904435973142220232802"; //Paste Your API Here
   String location = 'Danang'; //Default location
   String weatherIcon = 'heavycloudy.png';
@@ -39,7 +47,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   bool isLoaded = false;
   String msg = '';
   TempHumi dht = TempHumi(0, 0);
-  final channel = IOWebSocketChannel.connect(esp_url);
+  // final channel = IOWebSocketChannel.connect(esp_url);
 
   //API Call
   String searchWeatherAPI = "https://api.weatherapi.com/v1/forecast.json?key=" +
@@ -106,42 +114,85 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   void initState() {
     super.initState();
     fetchWeatherData(location);
-    channel.stream.listen(
-          (message) {
-        channel.sink.add('Flutter received $message');
-        if (message == "connected") {
-          print('Received from MCU: $message');
-          setState(() {
-            msg = message;
-          });
-        } else {
-          print('Received from MCU: $message');
-          // {'tempC':'30.50','humi':'64.00'}
-          Map<String, dynamic> json = jsonDecode(message);
-          setState(() {
-            soilMoistureValue = double.parse(message);
-            dht = TempHumi.fromJson(json);
-            isLoaded = true;
-          });
-        }
-        //channel.sink.close(status.goingAway);
-      },
-      onDone: () {
-        //if WebSocket is disconnected
-        print("Web socket is closed");
+    channel = IOWebSocketChannel.connect("ws://192.168.152.80:8080");
+    channel.stream.listen((data) {
+      try {
+        final messageObj = json.decode(data);
         setState(() {
-          msg = 'disconnected';
-          isLoaded = false;
+          _temperature = messageObj['temperature'].toString();
+          _humidity = messageObj['humidity'].toString();
+          _anaValue = messageObj['anaValue'].toString();
         });
-      },
-      onError: (error) {
-        print(error.toString());
-      },
-    );
+      } catch (e) {
+        print("Error: $e");
+      }
+    });
+
+    // channel = IOWebSocketChannel.connect(Uri.parse('ws://192.168.222.197:8080'));
+    // channel.stream.listen((data) {
+    //   try {
+    //     final messageObj = json.decode(data);
+    //     setState(() {
+    //       _temperature = messageObj['temperature'].toString();
+    //       print('$_temperature');
+    //       _humidity = messageObj['humidity'].toString();
+    //       _anaValue = messageObj['anaValue'].toString();
+    //     });
+    //   } catch (e) {
+    //     print("Error: $e");
+    //   }
+    // });
+    // channel.stream.listen(
+    //       (message) {
+    //     channel.sink.add('Flutter received $message');
+    //     if (message == "connected") {
+    //       print('Received from MCU: $message');
+    //       setState(() {
+    //         msg = message;
+    //       });
+    //     } else {
+    //       print('Received from MCU: $message');
+    //       // {'tempC':'30.50','humi':'64.00'}
+    //       Map<String, dynamic> json = jsonDecode(message);
+    //       setState(() {
+    //         soilMoistureValue = double.parse(message);
+    //         dht = TempHumi.fromJson(json);
+    //         isLoaded = true;
+    //       });
+    //     }
+    //     //channel.sink.close(status.goingAway);
+    //   },
+    //   onDone: () {
+    //     //if WebSocket is disconnected
+    //     print("Web socket is closed");
+    //     setState(() {
+    //       msg = 'disconnected';
+    //       isLoaded = false;
+    //     });
+    //   },
+    //   onError: (error) {
+    //     print(error.toString());
+    //   },
+    // );
     // Fluttertoast.showToast(${msg});
   }
-
-
+  // void _fetchData() {
+  //   try {
+  //     final messageObj = json.decode(channel.lastMessage.data);
+  //     setState(() {
+  //       _temperature = messageObj['temperature'].toString();
+  //       _humidity = messageObj['humidity'].toString();
+  //       _anaValue = messageObj['anaValue'].toString();
+  //     });
+  //   } catch (e) {
+  //     print("Error: $e");
+  //   }
+  // }
+  @override
+  void dispose() {
+    super.dispose();
+    channel.sink.close();
+  }
   // @override
   // void initState() {
   //   fetchWeatherData(location);
@@ -150,6 +201,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return  SingleChildScrollView(
       child:
       Column(
@@ -291,19 +343,17 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                   children: [
                     CustomPaint(
                       foregroundPainter:
-                      CircleProgress(10, true),
+                      CircleProgress(double.parse(_temperature), true),
                       child: Container(
                         width: 200,
                         height: 200,
                         child: Center(
-                          child: !isLoaded
-                              ? const CircularProgressIndicator()
-                              : Column(
+                          child:  Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text('Air Temperature'),
                               Text(
-                               '${dht.tempC.toStringAsFixed(1)}',
+                               '$_temperature',
                                 style: TextStyle(
                                     fontSize: 50, fontWeight: FontWeight.bold),
                               ),
@@ -319,21 +369,20 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                     ),
                     CustomPaint(
                       foregroundPainter:
+                      CircleProgress(double.parse(_humidity), false),
                       // CircleProgress(humidityAnimation.value, false),
-                      CircleProgress(20, false),
+
 
                       child: Container(
                         width: 200,
                         height: 200,
                         child: Center(
-                          child: !isLoaded
-                              ? const CircularProgressIndicator()
-                              : Column(
+                          child:  Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text('Air Humidity'),
                               Text(
-                                '${dht.humi.toStringAsFixed(1)}',
+                                '$_humidity',
                                 style: TextStyle(
                                     fontSize: 50, fontWeight: FontWeight.bold),
                               ),
@@ -352,20 +401,18 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                 CustomPaint(
                   foregroundPainter:
                   // CircleProgress(humidityAnimation.value, false),
-                  CircleProgress(20, false),
+                  CircleProgress(double.parse(_anaValue), false),
 
                   child: Container(
                     width: 200,
                     height: 200,
                     child: Center(
-                      child: !isLoaded
-                          ? const CircularProgressIndicator()
-                          :Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text('Soil Humidity'),
                           Text(
-                             '${soilMoistureValue.toStringAsFixed(1)}',
+                             '$_anaValue',
                             style: TextStyle(
                                 fontSize: 50, fontWeight: FontWeight.bold),
                           ),
@@ -379,7 +426,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                     ),
                   ),
                 ),
-              ],
+              ],//children
             ),
           ),
 

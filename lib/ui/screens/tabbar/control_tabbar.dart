@@ -30,7 +30,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
     //function to connect
     try {
       channel =
-          IOWebSocketChannel.connect("ws://192.168.0.1:81"); //channel IP : Port
+          IOWebSocketChannel.connect("ws://192.168.222.197:8080"); //channel IP : Port
       channel.stream.listen(
             (message) {
           print(message);

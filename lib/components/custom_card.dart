@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:green_garden/constants.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:http/http.dart' as http;
+
 
 class CustomCard extends StatefulWidget {
   const CustomCard(
@@ -106,7 +109,31 @@ class _CustomCardState extends State<CustomCard>
       print("Websocket is not connected.");
     }
   }
+  Future<http.Response> createAlbum(String data, String title) {
 
+    return http.post(
+      Uri.parse('http://192.168.152.80:3000/send-moto'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'data': data,
+        'title': title,
+      }),
+    );
+  }
+  //
+  // void sendMoto() async {
+  //   String url = 'http://localhost:3000/send-moto';
+  //   Map<String, String> headers = {"Content-type": "application/json"};
+  //   String json = '{data: 1}';
+  //   // tạo POST request
+  //   Response response = await post(url, headers: headers, body: json);
+  //   // kiểm tra status code của kết quả response
+  //   int statusCode = response.statusCode;
+  //   print(statusCode)
+  //
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -152,14 +179,18 @@ class _CustomCardState extends State<CustomCard>
                             _animationController.animateTo(0);
                           }
                           if (isChecked) {
+                            createAlbum("0","${widget.title}" );
+                            // sendMoto();
                             //if ledstatus is true, then turn off the led
                             //if led is on, turn off
-                            sendcmd("${widget.title}off");
+                            // sendcmd("${widget.title}off");
                             isChecked = false;
                           } else {
                             //if ledstatus is false, then turn on the led
                             //if led is off, turn on
-                            sendcmd("${widget.title}ron");
+                            createAlbum("1", "${widget.title}");
+                            // sendMoto();
+                            // sendcmd("${widget.title}on");
                             isChecked = true;
                           }
 
