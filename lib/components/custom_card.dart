@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:green_garden/constants.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+// Khởi tạo kết nối tới Firebase Realtime Database
+final databaseReference = FirebaseDatabase.instance.reference();
 
 
 class CustomCard extends StatefulWidget {
@@ -39,10 +44,10 @@ class _CustomCardState extends State<CustomCard>
   @override
   void initState() {
     // connect esp8266
-
-    Future.delayed(Duration.zero, () async {
-      channelconnect(); //connect to WebSocket wth NodeMCU
-    });
+    //
+    // Future.delayed(Duration.zero, () async {
+    //   channelconnect(); //connect to WebSocket wth NodeMCU
+    // });
 
     // code mobile
     _animationController = AnimationController(
@@ -63,52 +68,52 @@ class _CustomCardState extends State<CustomCard>
   }
 
   // esp8266 connect function
-  channelconnect() {
-    //function to connect
-    try {
-      channel =
-          IOWebSocketChannel.connect("ws://192.168.0.1:81"); //channel IP : Port
-      channel.stream.listen(
-            (message) {
-          print(message);
-          setState(() {
-            if (message == "connected") {
-              connected = true; //message is "connected" from NodeMCU
-            } else if (message == "${widget.title}on:success") {
-              isChecked = true;
-            } else if (message == "${widget.title}off:success") {
-              isChecked = false;
-            }
-          });
-        },
-        onDone: () {
-          //if WebSocket is disconnected
-          print("Web socket is closed");
-          setState(() {
-            connected = false;
-          });
-        },
-        onError: (error) {
-          print(error.toString());
-        },
-      );
-    } catch (_) {
-      print("error on connecting to websocket.");
-    }
-  }
-
-  Future<void> sendcmd(String cmd) async {
-    if (connected == true) {
-      if (isChecked == false && cmd != "${widget.title}on" && cmd != "${widget.title}off") {
-        print("Send the valid command");
-      } else {
-        channel.sink.add(cmd); //sending Command to NodeMCU
-      }
-    } else {
-      channelconnect();
-      print("Websocket is not connected.");
-    }
-  }
+  // channelconnect() {
+  //   //function to connect
+  //   try {
+  //     channel =
+  //         IOWebSocketChannel.connect("ws://192.168.0.1:81"); //channel IP : Port
+  //     channel.stream.listen(
+  //           (message) {
+  //         print(message);
+  //         setState(() {
+  //           if (message == "connected") {
+  //             connected = true; //message is "connected" from NodeMCU
+  //           } else if (message == "${widget.title}on:success") {
+  //             isChecked = true;
+  //           } else if (message == "${widget.title}off:success") {
+  //             isChecked = false;
+  //           }
+  //         });
+  //       },
+  //       onDone: () {
+  //         //if WebSocket is disconnected
+  //         print("Web socket is closed");
+  //         setState(() {
+  //           connected = false;
+  //         });
+  //       },
+  //       onError: (error) {
+  //         print(error.toString());
+  //       },
+  //     );
+  //   } catch (_) {
+  //     print("error on connecting to websocket.");
+  //   }
+  // }
+  //
+  // Future<void> sendcmd(String cmd) async {
+  //   if (connected == true) {
+  //     if (isChecked == false && cmd != "${widget.title}on" && cmd != "${widget.title}off") {
+  //       print("Send the valid command");
+  //     } else {
+  //       channel.sink.add(cmd); //sending Command to NodeMCU
+  //     }
+  //   } else {
+  //     channelconnect();
+  //     print("Websocket is not connected.");
+  //   }
+  // }
   Future<http.Response> createAlbum(String data, String title) {
 
     return http.post(
@@ -122,18 +127,7 @@ class _CustomCardState extends State<CustomCard>
       }),
     );
   }
-  //
-  // void sendMoto() async {
-  //   String url = 'http://localhost:3000/send-moto';
-  //   Map<String, String> headers = {"Content-type": "application/json"};
-  //   String json = '{data: 1}';
-  //   // tạo POST request
-  //   Response response = await post(url, headers: headers, body: json);
-  //   // kiểm tra status code của kết quả response
-  //   int statusCode = response.statusCode;
-  //   print(statusCode)
-  //
-  // }
+
 
   @override
   Widget build(BuildContext context) {

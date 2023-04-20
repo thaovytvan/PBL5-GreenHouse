@@ -108,7 +108,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   }
 
   //dht11, do am dat
-  double soilMoistureValue = 0;
+  // double soilMoistureValue = 0;
 
   @override
   void initState() {
@@ -226,7 +226,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                       margin: const EdgeInsets.all(10),
                       height: size.height * .17,
-                      width: size.width * .95,
+                      width: size.width * .94,
                       decoration: BoxDecoration(
                         gradient: Constants.linearGradientBlue,
                         boxShadow: [
@@ -278,10 +278,10 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                                     ),
                                   ),
                                   const Text(
-                                    ' O',
+                                    'O',
                                     style: TextStyle(
                                       color: Colors.white38,
-                                      fontSize: 40,
+                                      fontSize: 25,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -345,8 +345,8 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                       foregroundPainter:
                       CircleProgress(double.parse(_temperature), true),
                       child: Container(
-                        width: 200,
-                        height: 200,
+                        width: 190,
+                        height: 190,
                         child: Center(
                           child:  Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -374,8 +374,8 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
 
 
                       child: Container(
-                        width: 200,
-                        height: 200,
+                        width: 190,
+                        height: 190,
                         child: Center(
                           child:  Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -404,8 +404,8 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                   CircleProgress(double.parse(_anaValue), false),
 
                   child: Container(
-                    width: 200,
-                    height: 200,
+                    width: 190,
+                    height: 190,
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
