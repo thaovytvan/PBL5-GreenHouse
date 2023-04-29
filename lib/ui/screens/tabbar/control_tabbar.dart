@@ -5,6 +5,8 @@ import 'package:green_garden/constants.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
+
 
 
 class ControlTabBar extends StatefulWidget {
@@ -16,15 +18,21 @@ class ControlTabBar extends StatefulWidget {
 
 
 class _ControlTabBarState extends State<ControlTabBar> {
-  bool _isAuto =true;
+  bool _isAuto =false;
   // late IOWebSocketChannel channel;
   // bool connected=false; //boolean value to track if WebSocket is connected
-  final channel = IOWebSocketChannel.connect('ws://192.168.152.80:8080');
+  final channel = IOWebSocketChannel.connect('ws://192.168.160.80:8080');
+  String _light = "";
+  String _pan = "";
+  String _pump = "";
 
   bool _lightStatus = false;
   bool _pumpStatus = false;
   bool _panStatus = false;
-
+  // Timer.periodic(Duration(milliseconds: 1000), (Timer timer) {
+  // // Code thực hiện sau mỗi khoảng thời gian 1000ms (1 giây)
+  // channel.sink.add(1);
+  // });
   @override
   void initState() {
      //initially connection status is "NO" so its FALSE
@@ -32,29 +40,61 @@ class _ControlTabBarState extends State<ControlTabBar> {
     // Future.delayed(Duration.zero, () async {
     //   channelconnect(); //connect to WebSocket wth NodeMCU
     // });
-    channel.stream.listen((message) {
-      final data = jsonDecode(message);
-      final type = data['type'];
-      final status = data['status'];
-      if (type == 'LIGHTS') {
+    channel.stream.listen((data) {
+      try {
+        final messageObj = json.decode(data);
         setState(() {
-          _lightStatus = bool.fromEnvironment(status);
+          _light = messageObj['bongden'].toString();
+          _pan = messageObj['pan'].toString();
+          _pump = messageObj['moto'].toString();
+          _lightStatus = _light.toLowerCase() == '1';
+          _pumpStatus = _pump.toLowerCase() == '1';
+          _panStatus = _pan.toLowerCase() == '1';
+          print(_pumpStatus);
         });
-      } else if (type == 'WATER PUMP') {
-        setState(() {
-          _pumpStatus = bool.fromEnvironment(status);
-        });
-      } else if (type == 'FAN') {
-        setState(() {
-          _panStatus = bool.fromEnvironment(status);
-        });
+      } catch (e) {
+        print("Error: $e");
       }
     });
+    // channel.stream.listen((message) {
+    //   final data = jsonDecode(message);
+    //       setState(() {
+    //         _lightStatus = bool.fromEnvironment(data['bongden'].toString());
+    //         print(_lightStatus);
+    //       });
+    //   setState(() {
+    //     _pumpStatus = bool.fromEnvironment(data['moto'].toString());
+    //     print(_pumpStatus);
+    //   });
+    //   setState(() {
+    //     _panStatus = bool.fromEnvironment(data['fan'].toString());
+    //     print(_panStatus);
+    //   });
+
+
+
+    //   final type = data['type'];
+    //   final status = data['status'];
+    //   if (type == 'bongden') {
+    //     setState(() {
+    //       _lightStatus = bool.fromEnvironment(status);
+    //       print(_lightStatus);
+    //     });
+    //   } else if (type == 'moto') {
+    //     setState(() {
+    //       _pumpStatus = bool.fromEnvironment(status);
+    //     });
+    //   } else if (type == 'FAN') {
+    //     setState(() {
+    //       _panStatus = bool.fromEnvironment(status);
+    //     });
+    //   };
+    // });
     super.initState();
   }
   Future<http.Response> createAlbum(String data) {
     return http.post(
-      Uri.parse('http://192.168.152.80:3000/send-moto'),
+      Uri.parse('http://192.168.160.80:3000/send-moto'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -257,7 +297,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
                 title: "LIGHTS",
                 statusOn: "ON",
                 statusOff: "OFF",
-                deviceStatus: true,
+                deviceStatus: _lightStatus,
               ),
               const SizedBox(height: 15),
               CustomCardAuto(
@@ -270,7 +310,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
                 title: "FAN",
                 statusOn: "ON",
                 statusOff: "OFF",
-                deviceStatus: _panStatus,
+                deviceStatus: false,
               ),
               const SizedBox(height: 15),
               CustomCardAuto(
@@ -283,7 +323,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
                 title: "WATER PUMP",
                 statusOn: "ON",
                 statusOff: "OFF",
-                deviceStatus: true,
+                deviceStatus: _pumpStatus,
               ),
             ],
           ),

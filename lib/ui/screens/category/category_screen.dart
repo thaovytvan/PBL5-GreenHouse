@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:green_garden/constants.dart';
 import 'package:green_garden/ui/screens/tabbar/control_tabbar.dart';
 import 'package:green_garden/ui/screens/tabbar/overview_tabbar.dart';
+import 'package:green_garden/ui/screens/tabbar/device_history_tabbar.dart';
+import 'package:green_garden/ui/screens/tabbar/disease_history_tabbar.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({Key? key}) : super(key: key);
@@ -16,7 +18,7 @@ class _CategoryScreenState extends State<CategoryScreen>
   final List<Tab> myTabs = <Tab>[
     const Tab(text: 'Overview'),
     const Tab(text: 'Control'),
-    const Tab(text: 'Plant'),
+    const Tab(text: 'Device'),
     const Tab(text: 'Pest and Disease'),
     const Tab(text: 'Camera'),
   ];
@@ -24,8 +26,10 @@ class _CategoryScreenState extends State<CategoryScreen>
   final List<Widget> myTabViews = <Widget>[
     OverviewTabBar(),
     ControlTabBar(),
-    const Text('Plant History'),
-    const Text('Pest and Disease History'),
+    // const Text('Device History'),
+    MyWidget(),
+    // const Text('Pest and Disease History'),
+    DiseaseHistoryScreen(),
     const Text('Camera'),
   ];
 

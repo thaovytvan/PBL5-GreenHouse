@@ -117,7 +117,7 @@ class _CustomCardState extends State<CustomCard>
   Future<http.Response> createAlbum(String data, String title) {
 
     return http.post(
-      Uri.parse('http://192.168.152.80:3000/send-moto'),
+      Uri.parse('http://192.168.160.80:3000/send-moto'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
