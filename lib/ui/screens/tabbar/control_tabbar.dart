@@ -21,7 +21,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
   bool _isAuto =false;
   // late IOWebSocketChannel channel;
   // bool connected=false; //boolean value to track if WebSocket is connected
-  final channel = IOWebSocketChannel.connect('ws://192.168.160.80:8080');
+  final channel = IOWebSocketChannel.connect('ws://192.168.119.43:8080');
   String _light = "";
   String _pan = "";
   String _pump = "";
@@ -47,10 +47,11 @@ class _ControlTabBarState extends State<ControlTabBar> {
           _light = messageObj['bongden'].toString();
           _pan = messageObj['pan'].toString();
           _pump = messageObj['moto'].toString();
-          _lightStatus = _light.toLowerCase() == '1';
-          _pumpStatus = _pump.toLowerCase() == '1';
-          _panStatus = _pan.toLowerCase() == '1';
-          print(_pumpStatus);
+          _lightStatus = _light.toLowerCase() == 'true';
+          _pumpStatus = _pump.toLowerCase() == 'true';
+          _panStatus = _pan.toLowerCase() == 'true';
+          print("den: $_lightStatus");
+          print("moto: $_pumpStatus");
         });
       } catch (e) {
         print("Error: $e");
@@ -94,7 +95,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
   }
   Future<http.Response> createAlbum(String data) {
     return http.post(
-      Uri.parse('http://192.168.160.80:3000/send-moto'),
+      Uri.parse('http://192.168.119.43:3000/send-moto'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

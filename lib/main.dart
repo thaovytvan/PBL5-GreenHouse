@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:green_garden/ui/signin_page.dart';
+import 'package:green_garden/ui/home.dart';
 
 import 'ui/welcome.dart';
 void main() async {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Login',
-      home: SignIn(),
+      home: HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -27,9 +27,9 @@ class _CategoryScreenState extends State<CategoryScreen>
     OverviewTabBar(),
     ControlTabBar(),
     // const Text('Device History'),
-    MyWidget(),
+    DeviceHistoryWidget(),
     // const Text('Pest and Disease History'),
-    DiseaseHistoryScreen(),
+    DiseaseHistoryWidget(),
     const Text('Camera'),
   ];
 

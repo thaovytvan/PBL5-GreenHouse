@@ -1,125 +1,140 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-class DiseaseHistoryScreen extends StatefulWidget {
+
+class DiseaseHistoryWidget extends StatefulWidget {
   @override
-  _DiseaseHistoryScreenState createState() => _DiseaseHistoryScreenState();
+  _FirebaseRealtimeDatabaseWidgetState createState() =>
+      _FirebaseRealtimeDatabaseWidgetState();
 }
 
-class _DiseaseHistoryScreenState extends State<DiseaseHistoryScreen> {
-  final diseaseRef = FirebaseDatabase.instance.reference().child('db-pbl5');
+class _FirebaseRealtimeDatabaseWidgetState
+    extends State<DiseaseHistoryWidget> {
+  final DatabaseReference databaseReference = FirebaseDatabase.instance
+      .reference()
+      .child('history_saubo');
 
-  List<Map<String, dynamic>> _diseaseList = [];
-
+  final DateFormat inputFormat = DateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z", "en_US");
+  final DateFormat outputFormat = DateFormat("EEE MMM dd yyyy HH:mm:ss");
   @override
   void initState() {
+    init();
     super.initState();
-
-    // Lấy dữ liệu từ Firebase và lưu vào _diseaseList
-    // diseaseRef.once().then((DataSnapshot snapshot) {
-    //   Map<dynamic, dynamic> values = Map.from(snapshot.value!);
-    //   values.forEach((key, value) {
-    //     _diseaseList.add({
-    //       'picture': value['picture'],
-    //       'type': value['type'],
-    //       'id': value['id'],
-    //       'time': value['time'],
-    //     });
-    //   });
-    //   setState(() {});
-    // });
-
-
   }
+
+  init() async {
+    String deviceToken = await getDeviceToken();
+    print("###### PRINT DEVICE TOKEN TO USE FOR PUSH NOTIFCIATION ######");
+    print(deviceToken);
+    print("############################################################");
+
+    // listen for user to click on notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage remoteMessage) {
+      String? title = remoteMessage.notification!.title;
+      String? description = remoteMessage.notification!.body;
+
+      //im gonna have an alertdialog when clicking from push notification
+      Alert(
+        context: context,
+        type: AlertType.error,
+        title: title, // title from push notification data
+        desc: description, // description from push notifcation data
+        buttons: [
+          DialogButton(
+            child: Text(
+              "WARNNING!",
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            onPressed: () => Navigator.pop(context),
+      width: 120,
+
+      )
+        ],
+      ).show();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    // return  SingleChildScrollView(
-    //     child: DataTable(
-    //       columns: <DataColumn>[
-    //         DataColumn(label: Text('Picture', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-    //         DataColumn(label: Text('Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-    //         DataColumn(label: Text('ID', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-    //         DataColumn(label: Text('Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-    //       ],
-    //       rows: _diseaseList.map((disease) {
-    //         return DataRow(cells: [
-    //           DataCell(Image.network(disease['picture'])),
-    //           DataCell(Text(disease['type'], style: TextStyle(fontSize: 14))),
-    //           DataCell(Text(disease['id'], style: TextStyle(fontSize: 14))),
-    //           DataCell(Text(disease['time'], style: TextStyle(fontSize: 14))),
-    //         ]);
-    //       }).toList(),
-    //     ),
-    //
-    // );
-    Size size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      child:
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: size.width * 0.03),
-        child: Column(
-          children: [
-            const SizedBox(height: 15),
-            DataTable(
-              columns: <DataColumn>[
-                DataColumn(
-                  label: Text(
-                    'Time',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Light',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Moto',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Auto',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-              rows: <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('10:00 AM', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('On', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('Off', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('On', style: TextStyle(fontSize: 14))),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('11:00 AM', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('Off', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('On', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('Off', style: TextStyle(fontSize: 14))),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('12:00 PM', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('On', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('Off', style: TextStyle(fontSize: 14))),
-                    DataCell(Text('On', style: TextStyle(fontSize: 14))),
-                  ],
-                ),
-              ],
-            )
+    return StreamBuilder<DatabaseEvent>(
+      stream: databaseReference.orderByKey().limitToLast(20).onValue,
+      builder: (BuildContext context, AsyncSnapshot<DatabaseEvent> snapshot) {
+        if (snapshot.hasData) {
+          Map<dynamic, dynamic>? data =
+          snapshot.data!.snapshot.value as Map<dynamic, dynamic>?;
+          if (data != null) {
+            List<Map<String, dynamic>> rows = [];
+            data.forEach((key, item) {
+              DateTime dateTime = inputFormat.parse(item['time']);
+              rows.add({
+                'time': outputFormat.format(dateTime),
+                'image': item['image'] ?? '',
+              });
 
-          ],
-        ),
-      ),
+            });
+            rows.sort((a, b) => -a['time'].compareTo(b['time']));
+            int index = 0;
+            return SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                columnSpacing: 5.0,
+                columns: [
+                  DataColumn(label: Text('Id')),
+                  DataColumn(label: Text('Time')),
+                  DataColumn(label: Text('Image')),
+                ],
+                rows: rows
+                    .map((row) => DataRow(cells: [
+                  DataCell(Text('${++index}')),
+                  DataCell(Text(row['time'])),
+                  DataCell(GestureDetector(
+                    child: Image.network(row['image'],
+                      width: 50, // set the width to 200 pixels
+                      height: 50,),
+                    onTap: () {
+                      if (row['image'] != '') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Scaffold(
+                              appBar: AppBar(
+                                title: Text('Image'),
+                              ),
+                              body: Center(
+                                child: Image.network(row['image']),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  )),
+                ]))
+                    .toList(),
+              ),
+            );
+          } else {
+            return Text('No data available');
+          }
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
     );
-
   }
+  Future getDeviceToken() async {
+    //request user permission for push notification
+    FirebaseMessaging.instance.requestPermission();
+    FirebaseMessaging _firebaseMessage = FirebaseMessaging.instance;
+    String? deviceToken = await _firebaseMessage.getToken();
+    return (deviceToken == null) ? "" : deviceToken;
+  }
+
 }
