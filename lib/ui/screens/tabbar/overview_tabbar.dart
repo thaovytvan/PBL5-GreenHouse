@@ -26,6 +26,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   String _temperature = "0";
   String _humidity = "0";
   String _anaValue = "0";
+  // String _auTo = "0";
   //
   static String API_KEY = "681e5b5e20904435973142220232802"; //Paste Your API Here
   String location = 'Danang'; //Default location
@@ -114,7 +115,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   void initState() {
     super.initState();
     fetchWeatherData(location);
-    channel = IOWebSocketChannel.connect("ws://192.168.152.80:8080");
+    channel = IOWebSocketChannel.connect("ws://192.168.42.43:8080");
     channel.stream.listen((data) {
       try {
         final messageObj = json.decode(data);
@@ -122,6 +123,8 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
           _temperature = messageObj['temperature'].toString();
           _humidity = messageObj['humidity'].toString();
           _anaValue = messageObj['anaValue'].toString();
+          // _auTo = messageObj['b'].toString();
+          // print(_auTo);
         });
       } catch (e) {
         print("Error: $e");

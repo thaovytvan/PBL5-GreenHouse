@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:green_garden/ui/home.dart';
 
 import 'ui/welcome.dart';
-
-Future <void> main() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-    runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
