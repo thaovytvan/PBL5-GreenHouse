@@ -21,7 +21,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
   bool _isAuto =false;
   // late IOWebSocketChannel channel;
   // bool connected=false; //boolean value to track if WebSocket is connected
-  final channel = IOWebSocketChannel.connect('ws://192.168.119.43:8080');
+  final channel = IOWebSocketChannel.connect('ws://192.168.42.43:8080');
   String _light = "";
   String _pan = "";
   String _pump = "";
@@ -51,6 +51,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
           _pumpStatus = _pump.toLowerCase() == 'true';
           _panStatus = _pan.toLowerCase() == 'true';
           print("den: $_lightStatus");
+          print("FAN: $_lightStatus");
           print("moto: $_pumpStatus");
         });
       } catch (e) {
@@ -95,7 +96,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
   }
   Future<http.Response> createAlbum(String data) {
     return http.post(
-      Uri.parse('http://192.168.119.43:3000/send-moto'),
+      Uri.parse('http://192.168.42.43:3000/send-moto'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -311,7 +312,7 @@ class _ControlTabBarState extends State<ControlTabBar> {
                 title: "FAN",
                 statusOn: "ON",
                 statusOff: "OFF",
-                deviceStatus: false,
+                deviceStatus: _panStatus,
               ),
               const SizedBox(height: 15),
               CustomCardAuto(

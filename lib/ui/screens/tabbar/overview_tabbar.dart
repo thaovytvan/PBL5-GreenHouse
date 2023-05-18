@@ -115,7 +115,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   void initState() {
     super.initState();
     fetchWeatherData(location);
-    channel = IOWebSocketChannel.connect("ws://192.168.119.43:8080");
+    channel = IOWebSocketChannel.connect("ws://192.168.42.43:8080");
     channel.stream.listen((data) {
       try {
         final messageObj = json.decode(data);

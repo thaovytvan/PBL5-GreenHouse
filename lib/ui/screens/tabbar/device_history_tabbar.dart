@@ -29,7 +29,7 @@ class _FirebaseRealtimeDatabaseWidgetState extends State<DeviceHistoryWidget> {
             data.forEach((key, item) {
               DateTime dateTime = inputFormat.parse(item['time']);
               rows.add({
-                'bongden': item['bongden'] == 0 ? 'OFF' : 'ON',
+                'bongden': (item['bongden'] == 0 || item['bongden'] == '0')  ? 'OFF' : 'ON',
                 'time': outputFormat.format(dateTime),
                 'moto': item['moto'] == '0' ? 'OFF' : 'ON',
                 'tudong': item['tudong'] == '0' ? 'OFF' : 'ON',
