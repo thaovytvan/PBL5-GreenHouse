@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Send Image to Server</title>
+    <script>
+      var ws = new WebSocket("ws://192.168.8.43:8080", "camesp32");
+      
+      ws.onopen = function() {
+        console.log("Connected to server");
+      };
+      
+      ws.onmessage = function(event) {
+        console.log("Server says: " + event.data);
+      };
+      
+      ws.onclose = function(event) {
+        console.log("Disconnected from server");
+      };
+      
+      function sendImage() {
+        var fileInput = document.getElementById("image");
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          var imageBytes = event.target.result;
+          ws.send(imageBytes);
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Send Image to Server</h1>
+    <input type="file" id="image"><br>
+    <button onclick="sendImage()">Send</button>
+  </body>
+</html>
