@@ -19,9 +19,7 @@ class ControlTabBar extends StatefulWidget {
 
 class _ControlTabBarState extends State<ControlTabBar> {
   bool _isAuto =false;
-  // late IOWebSocketChannel channel;
-  // bool connected=false; //boolean value to track if WebSocket is connected
-  final channel = IOWebSocketChannel.connect('ws://192.168.42.43:8080');
+  final channel = IOWebSocketChannel.connect('ws://192.168.67.43:8080');
   String _light = "";
   String _pan = "";
   String _pump = "";
@@ -29,17 +27,8 @@ class _ControlTabBarState extends State<ControlTabBar> {
   bool _lightStatus = false;
   bool _pumpStatus = false;
   bool _panStatus = false;
-  // Timer.periodic(Duration(milliseconds: 1000), (Timer timer) {
-  // // Code thực hiện sau mỗi khoảng thời gian 1000ms (1 giây)
-  // channel.sink.add(1);
-  // });
   @override
   void initState() {
-     //initially connection status is "NO" so its FALSE
-    //
-    // Future.delayed(Duration.zero, () async {
-    //   channelconnect(); //connect to WebSocket wth NodeMCU
-    // });
     channel.stream.listen((data) {
       try {
         final messageObj = json.decode(data);
@@ -58,45 +47,11 @@ class _ControlTabBarState extends State<ControlTabBar> {
         print("Error: $e");
       }
     });
-    // channel.stream.listen((message) {
-    //   final data = jsonDecode(message);
-    //       setState(() {
-    //         _lightStatus = bool.fromEnvironment(data['bongden'].toString());
-    //         print(_lightStatus);
-    //       });
-    //   setState(() {
-    //     _pumpStatus = bool.fromEnvironment(data['moto'].toString());
-    //     print(_pumpStatus);
-    //   });
-    //   setState(() {
-    //     _panStatus = bool.fromEnvironment(data['fan'].toString());
-    //     print(_panStatus);
-    //   });
-
-
-
-    //   final type = data['type'];
-    //   final status = data['status'];
-    //   if (type == 'bongden') {
-    //     setState(() {
-    //       _lightStatus = bool.fromEnvironment(status);
-    //       print(_lightStatus);
-    //     });
-    //   } else if (type == 'moto') {
-    //     setState(() {
-    //       _pumpStatus = bool.fromEnvironment(status);
-    //     });
-    //   } else if (type == 'FAN') {
-    //     setState(() {
-    //       _panStatus = bool.fromEnvironment(status);
-    //     });
-    //   };
-    // });
     super.initState();
   }
   Future<http.Response> createAlbum(String data) {
     return http.post(
-      Uri.parse('http://192.168.42.43:3000/send-moto'),
+      Uri.parse('http://192.168.67.43:3000/send-moto'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -105,54 +60,6 @@ class _ControlTabBarState extends State<ControlTabBar> {
       }),
     );
   }
-
-  //
-  // channelconnect() {
-  //   //function to connect
-  //   try {
-  //     channel =
-  //         IOWebSocketChannel.connect("ws://192.168.222.197:8080"); //channel IP : Port
-  //     channel.stream.listen(
-  //           (message) {
-  //         print(message);
-  //         setState(() {
-  //           if (message == "connected") {
-  //             connected = true; //message is "connected" from NodeMCU
-  //           } else if (message == "autoon:success") {
-  //             _isAuto = true;
-  //           } else if (message == "autooff:success") {
-  //             _isAuto = false;
-  //           }
-  //         });
-  //       },
-  //       onDone: () {
-  //         //if WebSocket is disconnected
-  //         print("Web socket is closed");
-  //         setState(() {
-  //           connected = false;
-  //         });
-  //       },
-  //       onError: (error) {
-  //         print(error.toString());
-  //       },
-  //     );
-  //   } catch (_) {
-  //     print("error on connecting to websocket.");
-  //   }
-  // }
-  //
-  // Future<void> sendcmd(String cmd) async {
-  //   if (connected == true) {
-  //     if (_isAuto == false && cmd != "autoon" && cmd != "autooff") {
-  //       print("Send the valid command");
-  //     } else {
-  //       channel.sink.add(cmd); //sending Command to NodeMCU
-  //     }
-  //   } else {
-  //     channelconnect();
-  //     print("Websocket is not connected.");
-  //   }
-  // }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -188,16 +95,10 @@ class _ControlTabBarState extends State<ControlTabBar> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      // _isOn = !_isOn;
                       if (_isAuto) {
-                        //if ledstatus is true, then turn off the led
-                        //if led is on, turn off
-                        // sendcmd("autooff");
                         createAlbum("0" );
                         _isAuto = false;
                       } else {
-                        //if ledstatus is false, then turn on the led
-                        //if led is off, turn on
                         createAlbum("1" );
                         _isAuto = true;
                       }

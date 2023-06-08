@@ -12,8 +12,7 @@ import 'package:green_garden/constants.dart';
 import 'package:green_garden/components/weather_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-// const String esp_url = 'ws://192.168.222.197:8080';
-// final channel = IOWebSocketChannel.connect('ws://192.168.222.197:8080');
+
 
 class OverviewTabBar extends StatefulWidget {
   const OverviewTabBar({Key? key}) : super(key: key);
@@ -26,8 +25,6 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   String _temperature = "0";
   String _humidity = "0";
   String _anaValue = "0";
-  // String _auTo = "0";
-  //
   static String API_KEY = "681e5b5e20904435973142220232802"; //Paste Your API Here
   String location = 'Danang'; //Default location
   String weatherIcon = 'heavycloudy.png';
@@ -84,10 +81,6 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
         humidity = currentWeather["humidity"].toInt();
         cloud = currentWeather["cloud"].toInt();
 
-        //Forecast data
-        // dailyWeatherForecast = weatherData["forecast"]["forecastday"];
-        // hourlyWeatherForecast = dailyWeatherForecast[0]["hour"];
-        // print(dailyWeatherForecast);
       });
     } catch (e) {
       //debugPrint(e);
@@ -115,7 +108,7 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
   void initState() {
     super.initState();
     fetchWeatherData(location);
-    channel = IOWebSocketChannel.connect("ws://192.168.42.43:8080");
+    channel = IOWebSocketChannel.connect("ws://192.168.67.43:8080");
     channel.stream.listen((data) {
       try {
         final messageObj = json.decode(data);
@@ -130,77 +123,13 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
         print("Error: $e");
       }
     });
-
-    // channel = IOWebSocketChannel.connect(Uri.parse('ws://192.168.222.197:8080'));
-    // channel.stream.listen((data) {
-    //   try {
-    //     final messageObj = json.decode(data);
-    //     setState(() {
-    //       _temperature = messageObj['temperature'].toString();
-    //       print('$_temperature');
-    //       _humidity = messageObj['humidity'].toString();
-    //       _anaValue = messageObj['anaValue'].toString();
-    //     });
-    //   } catch (e) {
-    //     print("Error: $e");
-    //   }
-    // });
-    // channel.stream.listen(
-    //       (message) {
-    //     channel.sink.add('Flutter received $message');
-    //     if (message == "connected") {
-    //       print('Received from MCU: $message');
-    //       setState(() {
-    //         msg = message;
-    //       });
-    //     } else {
-    //       print('Received from MCU: $message');
-    //       // {'tempC':'30.50','humi':'64.00'}
-    //       Map<String, dynamic> json = jsonDecode(message);
-    //       setState(() {
-    //         soilMoistureValue = double.parse(message);
-    //         dht = TempHumi.fromJson(json);
-    //         isLoaded = true;
-    //       });
-    //     }
-    //     //channel.sink.close(status.goingAway);
-    //   },
-    //   onDone: () {
-    //     //if WebSocket is disconnected
-    //     print("Web socket is closed");
-    //     setState(() {
-    //       msg = 'disconnected';
-    //       isLoaded = false;
-    //     });
-    //   },
-    //   onError: (error) {
-    //     print(error.toString());
-    //   },
-    // );
-    // Fluttertoast.showToast(${msg});
   }
-  // void _fetchData() {
-  //   try {
-  //     final messageObj = json.decode(channel.lastMessage.data);
-  //     setState(() {
-  //       _temperature = messageObj['temperature'].toString();
-  //       _humidity = messageObj['humidity'].toString();
-  //       _anaValue = messageObj['anaValue'].toString();
-  //     });
-  //   } catch (e) {
-  //     print("Error: $e");
-  //   }
-  // }
+
   @override
   void dispose() {
     super.dispose();
     channel.sink.close();
   }
-  // @override
-  // void initState() {
-  //   fetchWeatherData(location);
-  //   super.initState();
-  // }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -373,7 +302,6 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                     CustomPaint(
                       foregroundPainter:
                       CircleProgress(double.parse(_humidity), false),
-                      // CircleProgress(humidityAnimation.value, false),
 
 
                       child: Container(
@@ -403,7 +331,6 @@ class _OverviewTabBarState extends State<OverviewTabBar>{
                 ),
                 CustomPaint(
                   foregroundPainter:
-                  // CircleProgress(humidityAnimation.value, false),
                   CircleProgress(double.parse(_anaValue), false),
 
                   child: Container(

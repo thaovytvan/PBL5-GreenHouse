@@ -54,17 +54,6 @@ class _CustomCardAutoState extends State<CustomCardAuto>
     );
     super.initState();
   }
-  //
-  // void _handleSwitchChanged(bool value) {
-  //   setState(() {
-  //     widget.deviceStatus = value;
-  //     if (value) {
-  //       _animationController.animateTo(1.0);
-  //     } else {
-  //       _animationController.animateBack(0);
-  //     }
-  //   });
-  // }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -100,21 +89,12 @@ class _CustomCardAutoState extends State<CustomCardAuto>
                   animation: _animationController,
                   builder: (animation, child) {
                     return GestureDetector(
-                      // setState(() {
-                      //   deviceStatus = value;
-                      //   if (value) {
-                      //     _animationController.animateTo(1.0);
-                      //   } else {
-                      //     _animationController.animateBack(0);
-                      //   }
-                      // });
                       child: Container(
                         height: 40,
                         width: 25,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.grey.shade50,
-
                         ),
                         child: Align(
                           alignment: !widget.deviceStatus

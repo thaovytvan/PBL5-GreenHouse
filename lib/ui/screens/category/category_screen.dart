@@ -26,9 +26,7 @@ class _CategoryScreenState extends State<CategoryScreen>
   final List<Widget> myTabViews = <Widget>[
     OverviewTabBar(),
     ControlTabBar(),
-    // const Text('Device History'),
     DeviceHistoryWidget(),
-    // const Text('Pest and Disease History'),
     DiseaseHistoryWidget(),
     const Text('Camera'),
   ];

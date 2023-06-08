@@ -77,7 +77,18 @@ class _FirebaseRealtimeDatabaseWidgetState
               });
 
             });
-            rows.sort((a, b) => -a['time'].compareTo(b['time']));
+            // rows.sort((a, b) => -a['time'].compareTo(b['time']));
+            rows.sort((a, b) {
+              DateTime dateTimeA = outputFormat.parse(a['time']);
+              DateTime dateTimeB = outputFormat.parse(b['time']);
+
+              int dateComparison = -dateTimeA.compareTo(dateTimeB);
+              if (dateComparison != 0) {
+                return dateComparison;
+              } else {
+                return -a['time'].compareTo(b['time']);
+              }
+            });
             int index = 0;
             return SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -94,7 +105,7 @@ class _FirebaseRealtimeDatabaseWidgetState
                   DataCell(Text(row['time'])),
                   DataCell(GestureDetector(
                     child: Image.network(row['image'],
-                      width: 50, // set the width to 200 pixels
+                      width: 50,
                       height: 50,),
                     onTap: () {
                       if (row['image'] != '') {
@@ -130,7 +141,6 @@ class _FirebaseRealtimeDatabaseWidgetState
     );
   }
   Future getDeviceToken() async {
-    //request user permission for push notification
     FirebaseMessaging.instance.requestPermission();
     FirebaseMessaging _firebaseMessage = FirebaseMessaging.instance;
     String? deviceToken = await _firebaseMessage.getToken();

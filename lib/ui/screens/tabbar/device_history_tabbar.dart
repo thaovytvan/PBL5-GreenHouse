@@ -35,7 +35,19 @@ class _FirebaseRealtimeDatabaseWidgetState extends State<DeviceHistoryWidget> {
                 'tudong': item['tudong'] == '0' ? 'OFF' : 'ON',
               });
             });
-            rows.sort((a, b) => -a['time'].compareTo(b['time']));
+            // rows.sort((a, b) => -a['time'].compareTo(b['time']));
+            rows.sort((a, b) {
+              DateTime dateTimeA = outputFormat.parse(a['time']);
+              DateTime dateTimeB = outputFormat.parse(b['time']);
+
+              int dateComparison = -dateTimeA.compareTo(dateTimeB);
+              if (dateComparison != 0) {
+                return dateComparison;
+              } else {
+                return -a['time'].compareTo(b['time']);
+              }
+            });
+
             int index = 0;
             return SingleChildScrollView(
               scrollDirection: Axis.vertical,

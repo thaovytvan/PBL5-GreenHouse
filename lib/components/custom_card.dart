@@ -43,13 +43,7 @@ class _CustomCardState extends State<CustomCard>
 
   @override
   void initState() {
-    // connect esp8266
-    //
-    // Future.delayed(Duration.zero, () async {
-    //   channelconnect(); //connect to WebSocket wth NodeMCU
-    // });
 
-    // code mobile
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 350),
@@ -67,57 +61,10 @@ class _CustomCardState extends State<CustomCard>
     super.initState();
   }
 
-  // esp8266 connect function
-  // channelconnect() {
-  //   //function to connect
-  //   try {
-  //     channel =
-  //         IOWebSocketChannel.connect("ws://192.168.0.1:81"); //channel IP : Port
-  //     channel.stream.listen(
-  //           (message) {
-  //         print(message);
-  //         setState(() {
-  //           if (message == "connected") {
-  //             connected = true; //message is "connected" from NodeMCU
-  //           } else if (message == "${widget.title}on:success") {
-  //             isChecked = true;
-  //           } else if (message == "${widget.title}off:success") {
-  //             isChecked = false;
-  //           }
-  //         });
-  //       },
-  //       onDone: () {
-  //         //if WebSocket is disconnected
-  //         print("Web socket is closed");
-  //         setState(() {
-  //           connected = false;
-  //         });
-  //       },
-  //       onError: (error) {
-  //         print(error.toString());
-  //       },
-  //     );
-  //   } catch (_) {
-  //     print("error on connecting to websocket.");
-  //   }
-  // }
-  //
-  // Future<void> sendcmd(String cmd) async {
-  //   if (connected == true) {
-  //     if (isChecked == false && cmd != "${widget.title}on" && cmd != "${widget.title}off") {
-  //       print("Send the valid command");
-  //     } else {
-  //       channel.sink.add(cmd); //sending Command to NodeMCU
-  //     }
-  //   } else {
-  //     channelconnect();
-  //     print("Websocket is not connected.");
-  //   }
-  // }
   Future<http.Response> createAlbum(String data, String title) {
 
     return http.post(
-      Uri.parse('http://192.168.42.43:3000/send-moto'),
+      Uri.parse('http://192.168.67.43:3000/send-moto'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

@@ -194,7 +194,7 @@ class _SignInState extends State<SignIn>{
                   Navigator.pushReplacement(
                       context,
                       PageTransition(
-                          child: const SignUp(),
+                          child:  SignUp(),
                           type: PageTransitionType.bottomToTop));
                 },
 

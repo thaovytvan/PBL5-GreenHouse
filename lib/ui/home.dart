@@ -86,14 +86,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ],
                           ),
-                          // const Text(
-                          //   '    Hello, Vy',
-                          //   style: TextStyle(
-                          //     color: Colors.black87,
-                          //     fontWeight: FontWeight.w400,
-                          //     fontSize: 20,
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),

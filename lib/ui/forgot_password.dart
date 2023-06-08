@@ -36,12 +36,15 @@ class ForgotPassword extends StatelessWidget {
               icon: Icons.mail_outline,
 
             ),
+            const SizedBox(
+              height: 10,
+            ),
             GestureDetector(
               onTap: () {
                 Navigator.pushReplacement(
                     context,
                     PageTransition(
-                        child: const SignIn(),
+                        child:  SignIn(),
                         type: PageTransitionType.bottomToTop));
               },
               child: Container(
@@ -71,10 +74,9 @@ class ForgotPassword extends StatelessWidget {
                 Navigator.pushReplacement(
                     context,
                     PageTransition(
-                        child: const SignUp(),
+                        child:  SignUp(),
                         type: PageTransitionType.bottomToTop));
               },
-
               child: Center(
                 child: Text.rich(TextSpan(children: [
                   TextSpan(
